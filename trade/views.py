@@ -4,7 +4,7 @@ import pandas as pd, json
 
 class MainView(View):
     def getCSVJSON(self):
-        table = pd.read_csv('static/yndx.csv')
+        table = pd.read_csv('static/EURUSD.csv')
         output = []
         for index, row in table.iterrows():
             output.append([
@@ -12,6 +12,7 @@ class MainView(View):
                     row['<HIGH>'],
                     row['<LOW>'],
                     row['<CLOSE>'],
+                    row['<TIME>'],
                 ])
         return json.dumps(output)
 
