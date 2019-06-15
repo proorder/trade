@@ -103,6 +103,19 @@ class Graph {
         t3.y - t3.low - t3.body - t3.high + 0.5
       );
       this.ctx.stroke();
+    } else {
+      let t1 = this.bars[points.t1.LOW];
+      let t3 = this.bars[points.t3.LOW];
+      this.ctx.strokeStyle = "rgb(0, 83, 138)";
+      this.ctx.moveTo(
+        t1.x + this.getBarWidth() / 2,
+        t1.y + 0.5
+      );
+      this.ctx.lineTo(
+        t3.x + this.getBarWidth() / 2,
+        t3.y + 0.5
+      );
+      this.ctx.stroke();
     }
   }
 
