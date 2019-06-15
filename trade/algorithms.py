@@ -50,6 +50,7 @@ def approve_t1(table, start):
         p_t2 = find_potential_t1_up(table, start+1)
         if p_t2:
             # TODO: Проверить т3 на пробитие уровня т1
+            # MARK: 
             return {
                 't1': {
                     'LOW': p_t1,
@@ -86,6 +87,13 @@ def approve_t1(table, start):
             return False
 
 
+def is_aligned_low(table, t1, t2):
+    if table.iloc[t1]['<LOW>'] < table.iloc[t2]['<LOW>']:
+        return True
+    else:
+        return False
+
+
 def find_potential_t1_up(table, start):
     iter = table.iterrows()
     for count, (index, row) in enumerate(iter):
@@ -103,6 +111,8 @@ def find_potential_t1_down(table, start):
         if count < start: continue
         try:
             if float(row['<LOW>']) < float(table.iloc[count+1]['<LOW>']):
-                return count
+                if not is_aligned_low(table, count-1, count):
+                    return count
         except Exception:
             return False
+
