@@ -3,7 +3,7 @@ const HIGH = 1;
 const LOW = 2;
 const CLOSE = 3;
 const BAR_WIDTH = 7;
-const VERTICAL_OFFSET = 20;
+const VERTICAL_OFFSET = 40;
 
 class Graph {
   constructor(canvas) {
@@ -49,7 +49,12 @@ class Graph {
       this.ctx.translate(bar.x, this.height - 10);
       this.ctx.fillStyle = "rgb(100, 210, 255)";
       this.ctx.rotate(-90*Math.PI/180);
-      this.ctx.fillText(bar.date, 0, 0);
+      this.ctx.fillText(
+        bar.date + " " + this.source[this.source.length - 1 - a][OPEN] + " "
+        + this.source[this.source.length - 1 - a][HIGH] + " "
+        + this.source[this.source.length - 1 - a][LOW] + " "
+        + this.source[this.source.length - 1 - a][CLOSE],
+        0, 4);
       this.ctx.restore();
       this.ctx.moveTo(bar.x + this.getBarWidth() / 2, bar.y + 0.5);
       this.ctx.lineTo(
@@ -85,7 +90,7 @@ class Graph {
 
   createBar(data, i, index) {
     let bar = {};
-    bar.x = this.width - i * this.getBarWidth();
+    bar.x = this.width - i * this.getBarWidth() - this.getBarWidth();
     bar.y = this.height - ( (data[LOW] - this.low) * this.heightCoeff ) - VERTICAL_OFFSET;
     bar.date = data[4];
 
@@ -113,13 +118,14 @@ class Graph {
     let minHeight = this.source[this.sourceIndex][LOW];
 
     for (let i = this.sourceIndex; i < barsCount; i++) {
-      if (this.source[i][HIGH] > maxHeight) {
-        maxHeight = this.source[i][HIGH];
-        maxHeightIndex = i;
+      let a = this.source.length - 1 - this.sourceIndex - i;
+      if (this.source[a][HIGH] > maxHeight) {
+        maxHeight = this.source[a][HIGH];
+        maxHeightIndex = a;
       }
-      if (this.source[i][LOW] < minHeight) {
-        minHeight = this.source[i][LOW];
-        minHeightIndex = i;
+      if (this.source[a][LOW] < minHeight) {
+        minHeight = this.source[a][LOW];
+        minHeightIndex = a;
       }
     }
     this.low = minHeight;
