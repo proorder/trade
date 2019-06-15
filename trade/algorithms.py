@@ -32,9 +32,12 @@ def ext_srch(table, bar):
 def algorithm_t1(table):
     start = 0
     t1 = table.iloc[start]
-    return find_potential_t1_up(table, 1)
     if float(t1['<OPEN>']) < float(t1['<CLOSE>']):
         # LOW
+        p_t1 = find_potential_t1_up(table, start+1)
+        p_t3 = find_potential_t1_up(table, p_t1+1)
+        print(p_t1)
+        print(p_t3)
         return 'uprising: ' + str(t1['<TIME>']) + ' : ' + str(t1['<OPEN>']) + ' : ' +  str(t1['<CLOSE>'])
     else:
         # HIGH
@@ -43,12 +46,10 @@ def algorithm_t1(table):
 
 def find_potential_t1_up(table, start):
     iter = table.iterrows()
-    count = 0
-    for index, row in iter:
-        count += 1
-        print(str(row['<HIGH>']) + ' ' + str(table.iloc[count]['<HIGH>']) + ' ' + str(table.iloc[count]['<TIME>']))
+    for count, (index, row) in enumerate(iter):
+        if count < start: continue
         try:
-            if float(row['<HIGH>']) > float(table.iloc[count]['<HIGH>']):
-                return count-1
+            if float(row['<HIGH>']) > float(table.iloc[count+1]['<HIGH>']):
+                return count
         except Exception:
             return False
