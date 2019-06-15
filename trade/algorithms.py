@@ -31,17 +31,59 @@ def ext_srch(table, bar):
 
 def algorithm_t1(table):
     start = 0
+    while True:
+        iter = approve_t1(table, start)
+        if iter:
+            return iter
+        else:
+            # TODO: Проверить количество итераций по ТЗ
+            start += 1
+
+
+def approve_t1(table, start):
     t1 = table.iloc[start]
     if float(t1['<OPEN>']) < float(t1['<CLOSE>']):
-        # LOW
+        # HIGH точка
+        # Ищем по LOW
+        p_t1 = find_potential_t1_down(table, start+1)
+        p_t3 = find_potential_t1_down(table, p_t1+1)
+        p_t2 = find_potential_t1_up(table, start+1)
+        if p_t2:
+            # TODO: Проверить т3 на пробитие уровня т1
+            return {
+                't1': {
+                    'LOW': p_t1,
+                    'HIGH': None
+                },
+                't3': {
+                    'LOW': p_t3,
+                    'HIGH': None
+                }
+            }
+        else:
+            # TODO: Не нашел t2
+            return False
+    else:
+        # LOW точка
+        # Ищем по HIGH
         p_t1 = find_potential_t1_up(table, start+1)
         p_t3 = find_potential_t1_up(table, p_t1+1)
-        print(p_t1)
-        print(p_t3)
-        return 'uprising: ' + str(t1['<TIME>']) + ' : ' + str(t1['<OPEN>']) + ' : ' +  str(t1['<CLOSE>'])
-    else:
-        # HIGH
-        return 'downrising: ' + str(t1['<TIME>']) + ' : ' + str(t1['<OPEN>']) + ' : ' +  str(t1['<CLOSE>'])
+        p_t2 = find_potential_t1_down(table, start+1)
+        if p_t2:
+            # TODO: Проверить т3 на пробитие уровня т1
+            return {
+                't1': {
+                    'LOW': None,
+                    'HIGH': p_t1
+                },
+                't3': {
+                    'LOW': None,
+                    'HIGH': p_t3
+                }
+            }
+        else:
+            # TODO: Не нашел t2
+            return False
 
 
 def find_potential_t1_up(table, start):
@@ -50,6 +92,17 @@ def find_potential_t1_up(table, start):
         if count < start: continue
         try:
             if float(row['<HIGH>']) > float(table.iloc[count+1]['<HIGH>']):
+                return count
+        except Exception:
+            return False
+
+
+def find_potential_t1_down(table, start):
+    iter = table.iterrows()
+    for count, (index, row) in enumerate(iter):
+        if count < start: continue
+        try:
+            if float(row['<LOW>']) < float(table.iloc[count+1]['<LOW>']):
                 return count
         except Exception:
             return False

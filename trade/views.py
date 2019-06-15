@@ -7,7 +7,7 @@ class MainView(View):
     def getCSVJSON(self):
         table = pd.read_csv('static/EURUSD.csv')
         output = []
-        print(algorithm_t1(table.iloc[::-1]))
+        self.points = algorithm_t1(table.iloc[::-1])
         for index, row in table.iterrows():
             output.append([
                     row['<OPEN>'],
@@ -19,5 +19,8 @@ class MainView(View):
         return json.dumps(output)
 
     def get(self, request, *args, **kwargs):
-        context = {'csv': self.getCSVJSON()}
+        context = {
+            'csv': self.getCSVJSON(),
+            'points': json.dumps(self.points)
+        }
         return render(request, 'index.html', context=context)
