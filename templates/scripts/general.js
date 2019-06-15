@@ -93,6 +93,8 @@ class Graph {
     if (points.t1.LOW === null) {
       let t1 = this.bars[points.t1.HIGH];
       let t3 = this.bars[points.t3.HIGH];
+      let t2 = this.bars[points.t2.LOW];
+      let t4 = this.bars[points.t4.LOW];
       this.ctx.strokeStyle = "rgb(0, 83, 138)";
       this.ctx.moveTo(
         t1.x + this.getBarWidth() / 2,
@@ -102,10 +104,20 @@ class Graph {
         t3.x + this.getBarWidth() / 2,
         t3.y - t3.low - t3.body - t3.high + 0.5
       );
+      this.ctx.moveTo(
+        t2.x + this.getBarWidth() / 2,
+        t2.y + 0.5
+      );
+      this.ctx.lineTo(
+        t4.x + this.getBarWidth() / 2,
+        t4.y + 0.5
+      );
       this.ctx.stroke();
     } else {
       let t1 = this.bars[points.t1.LOW];
       let t3 = this.bars[points.t3.LOW];
+      let t2 = this.bars[points.t2.HIGH];
+      let t4 = this.bars[points.t4.HIGH];
       this.ctx.strokeStyle = "rgb(0, 83, 138)";
       this.ctx.moveTo(
         t1.x + this.getBarWidth() / 2,
@@ -114,6 +126,14 @@ class Graph {
       this.ctx.lineTo(
         t3.x + this.getBarWidth() / 2,
         t3.y + 0.5
+      );
+      this.ctx.moveTo(
+        t2.x + this.getBarWidth() / 2,
+        t2.y - t2.low - t2.body - t2.high + 0.5
+      );
+      this.ctx.lineTo(
+        t4.x + this.getBarWidth() / 2,
+        t4.y - t4.low - t4.body - t4.high + 0.5
       );
       this.ctx.stroke();
     }
