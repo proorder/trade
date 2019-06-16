@@ -9,6 +9,7 @@
   </script>
   <script>
     {% include "scripts/general.js" %}
+    {% include "scripts/main.js" %}
   </script>
   <style>
     body {
@@ -17,6 +18,9 @@
   </style>
 </head>
 <body>
+  <div>
+    Масштаб: <button onClick="prevSize()">-</button><button onClick="nextSize()">+</button>
+  </div>
   <canvas id="cv"></canvas>
 </body>
 </html>

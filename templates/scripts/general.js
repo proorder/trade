@@ -2,8 +2,10 @@ const OPEN = 0;
 const HIGH = 1;
 const LOW = 2;
 const CLOSE = 3;
-const BAR_WIDTH = 7;
+let BAR_MARGIN = 8;
+let BAR_WIDTH = 11;
 const VERTICAL_OFFSET = 40;
+var graph;
 
 class Graph {
   constructor(canvas) {
@@ -26,9 +28,15 @@ class Graph {
   addBars(source) {
     this.source = source;
     this.heightCoeff  = this.findHeightCoeff();
+    this.defineBars();
+    this.drawBars();
+  }
+
+  defineBars() {
+    this.bars = [];
     let barsCount = Math.ceil( this.width / this.getBarWidth() );
-    if (this.source.length < barsCount) {
-      barsCount = this.source.length;
+    if (this.source.length - this.sourceIndex < barsCount) {
+      barsCount = this.source.length - this.sourceIndex;
     }
 
     for (let i = this.sourceIndex; i < barsCount; i++) {
@@ -40,7 +48,6 @@ class Graph {
         )
       );
     }
-    this.drawBars();
   }
 
   drawBars() {
@@ -51,14 +58,6 @@ class Graph {
       // this.ctx.fillStyle = "rgb(100, 210, 255)";
       this.ctx.fillStyle = "rgb(180, 180, 180)";
       this.ctx.rotate(-90*Math.PI/180);
-      /*
-      this.ctx.fillText(
-        bar.date + " " + this.source[this.source.length - 1 - a][OPEN] + " "
-        + this.source[this.source.length - 1 - a][HIGH] + " "
-        + this.source[this.source.length - 1 - a][LOW] + " "
-        + this.source[this.source.length - 1 - a][CLOSE],
-        0, 4);
-      */
       this.ctx.fillText(
         bar.date + "     "
         + "HIGH: " + this.source[this.source.length - 1 - a][HIGH] + "     "
@@ -80,7 +79,7 @@ class Graph {
       if (bar.uprising) {
         this.ctx.fillStyle = "rgb(28, 209, 88)";
         this.ctx.fillRect(
-          bar.x + 4,
+          bar.x + BAR_MARGIN,
           bar.y - bar.low - bar.body + 0.5,
           BAR_WIDTH * this.scaleCoeff,
           bar.body
@@ -88,7 +87,7 @@ class Graph {
       } else {
         this.ctx.fillStyle = "rgb(255, 69, 58)";
         this.ctx.fillRect(
-          bar.x + 4,
+          bar.x + BAR_MARGIN,
           bar.y - bar.low - bar.body + 0.5,
           BAR_WIDTH * this.scaleCoeff,
           bar.body
@@ -107,6 +106,12 @@ class Graph {
       );
       this.ctx.stroke();
     }
+  }
+
+  redraw() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.defineBars();
+    this.drawBars();
   }
 
   drawLine(points) {
@@ -207,7 +212,7 @@ class Graph {
   }
 
   getBarWidth() {
-    return BAR_WIDTH * this.scaleCoeff + 8;
+    return BAR_WIDTH * this.scaleCoeff + BAR_MARGIN*2;
   }
 
   drawGraph() {
@@ -229,5 +234,5 @@ class Graph {
 }
 
 window.addEventListener('load', function() {
-  new Graph(document.getElementById('cv'));
+  graph = new Graph(document.getElementById('cv'));
 });
