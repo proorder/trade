@@ -5,7 +5,7 @@ from .algorithms import algorithm_t1
 
 class MainView(View):
     def getCSVJSON(self):
-        table = pd.read_csv('static/EURUSD.csv')
+        table = pd.read_csv('static/GBPAUD.csv')
         output = []
         self.points = algorithm_t1(table.iloc[::-1])
         for index, row in table.iterrows():

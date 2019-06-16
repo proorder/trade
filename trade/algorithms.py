@@ -52,17 +52,17 @@ def approve_t1(table, start):
         if p_t2:
             # TODO: Проверить т3 на пробитие уровня т1
             #MARK: - stupid unproven breakdown check for HIGH t1
-            for bar in table[p_t1:p_t3]:
-                if table['<CLOSE>'][bar] < table["<OPEN>"][bar]:
-                    if table['<OPEN>'][bar] > np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        continue
-                    else:
-                        print("[t3:t1] is broken down, search for another t3")
-                else: 
-                    if table['<CLOSE>'][bar] > np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        continue
-                    else:
-                        print("[t3:t1] is broken down, search for another t3")
+            # for bar in table[p_t1:p_t3]:
+                # if table['<CLOSE>'][bar] < table["<OPEN>"][bar]:
+                    # if table['<OPEN>'][bar] > np.quantile(table[p_t1:p_t3], 1/bar+1):
+                        # continue
+                    # else:
+                        # print("[t3:t1] is broken down, search for another t3")
+                # else: 
+                    # if table['<CLOSE>'][bar] > np.quantile(table[p_t1:p_t3], 1/bar+1):
+                        # continue
+                    # else:
+                        # print("[t3:t1] is broken down, search for another t3")
 
             # MARK: 
             return {
@@ -95,20 +95,19 @@ def approve_t1(table, start):
         p_t4 = find_potential_t1_down(table, p_t2+1)
         if p_t2:
             # TODO: Проверить т3 на пробитие уровня т1
-            #MARK: - stupid unproven breakdown check for LOW t1
-            for bar in table[p_t1:p_t3]:
-                if table['<CLOSE>'][bar] < table["<OPEN>"][bar]:
-                    if table['<CLOSE>'][bar] < np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        continue
-                    else:
-                        print("[t3:t1] is broken down, search for another t3")
-                else: 
-                    if table['<OPEN>'][bar] < np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        continue
-                    else:
-                        print("[t3:t1] is broken down, search for another t3")
-
-                        
+            # MARK: - stupid unproven breakdown check for LOW t1
+            # for bar in table[p_t1:p_t3]:
+                # if table['<CLOSE>'][bar] < table["<OPEN>"][bar]:
+                    # if table['<CLOSE>'][bar] < np.quantile(table[p_t1:p_t3], 1/bar+1):
+                        # continue
+                    # else:
+                        # print("[t3:t1] is broken down, search for another t3")
+                # else: 
+                    # if table['<OPEN>'][bar] < np.quantile(table[p_t1:p_t3], 1/bar+1):
+                        # continue
+                    # else:
+                        # print("[t3:t1] is broken down, search for another t3")
+                        # 
             return {
                 't1': {
                     'LOW': None,

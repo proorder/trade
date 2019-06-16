@@ -48,15 +48,29 @@ class Graph {
       let bar = this.bars[a];
       this.ctx.save();
       this.ctx.translate(bar.x, this.height - 10);
-      this.ctx.fillStyle = "rgb(100, 210, 255)";
+      // this.ctx.fillStyle = "rgb(100, 210, 255)";
+      this.ctx.fillStyle = "rgb(180, 180, 180)";
       this.ctx.rotate(-90*Math.PI/180);
+      /*
       this.ctx.fillText(
         bar.date + " " + this.source[this.source.length - 1 - a][OPEN] + " "
         + this.source[this.source.length - 1 - a][HIGH] + " "
         + this.source[this.source.length - 1 - a][LOW] + " "
         + this.source[this.source.length - 1 - a][CLOSE],
         0, 4);
+      */
+      this.ctx.fillText(
+        bar.date + "     "
+        + "HIGH: " + this.source[this.source.length - 1 - a][HIGH] + "     "
+        + "LOW: " + this.source[this.source.length - 1 - a][LOW] + "     ",
+        0, 4);
       this.ctx.restore();
+      this.ctx.beginPath();
+      if (bar.uprising) {
+        this.ctx.strokeStyle = "rgb(28, 209, 88)";
+      } else {
+        this.ctx.strokeStyle = "rgb(255, 69, 58)";
+      }
       this.ctx.moveTo(bar.x + this.getBarWidth() / 2, bar.y + 0.5);
       this.ctx.lineTo(
         bar.x + this.getBarWidth() / 2,
@@ -79,6 +93,12 @@ class Graph {
           BAR_WIDTH * this.scaleCoeff,
           bar.body
         );
+      }
+      this.ctx.beginPath();
+      if (bar.uprising) {
+        this.ctx.strokeStyle = "rgb(28, 209, 88)";
+      } else {
+        this.ctx.strokeStyle = "rgb(255, 69, 58)";
       }
       this.ctx.moveTo(bar.x + this.getBarWidth() / 2, bar.y - bar.low - bar.body + 0.5);
       this.ctx.lineTo(
@@ -142,6 +162,9 @@ class Graph {
   createBar(data, i, index) {
     let bar = {};
     bar.x = this.width - i * this.getBarWidth() - this.getBarWidth();
+    if (data[LOW] === this.low) {
+      console.log(this.low);
+    }
     bar.y = this.height - ( (data[LOW] - this.low) * this.heightCoeff ) - VERTICAL_OFFSET;
     bar.date = data[4];
 
@@ -166,7 +189,7 @@ class Graph {
     let minHeightIndex = 0;
     let maxHeightIndex = 0;
     let maxHeight = 0;
-    let minHeight = this.source[this.sourceIndex][LOW];
+    let minHeight = this.source[this.source.length - 1 - this.sourceIndex][LOW];
 
     for (let i = this.sourceIndex; i < barsCount; i++) {
       let a = this.source.length - 1 - this.sourceIndex - i;
@@ -176,7 +199,7 @@ class Graph {
       }
       if (this.source[a][LOW] < minHeight) {
         minHeight = this.source[a][LOW];
-        minHeightIndex = a;
+        minHeightIndex = this.source[a];
       }
     }
     this.low = minHeight;
@@ -189,6 +212,8 @@ class Graph {
 
   drawGraph() {
     this.ctx.beginPath();
+    this.ctx.fillStyle = 'rgb(247, 247, 247)';
+    this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.lineWidth = 1;
     this.ctx.moveTo(5.5, 0);
     this.ctx.lineTo(5.5, this.height - 5.5);
