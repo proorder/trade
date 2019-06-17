@@ -1,169 +1,185 @@
-import numpy as np
-import pandas as pd
-
-def ext_srch(table, bar):
-    reversed_table = table['<CLOSE>'][::-1]
-    start = reversed_table[bar]
-    print('Rev: ' + reversed_table)
-    print('Start' + start)
-    t3_candidate = 0
-    t3_candidate_index = 0
-    
-    for index in range(len(reversed_table)):
-        if reversed_table[index+1] == start:
-            t3_candidate = reversed_table[index+1]
-            t3_candidate_index = index+1
-            break
-   
-    if start > max(reversed_table[bar+1:t3_candidate_index]):
-       print("t1 is high with approval extremum: {}".format(min(reversed_table[bar+1:t3_candidate_index])))
-       print(reversed_table[bar+1:t3_candidate_index])
-    else:
-       print("t1 is low with approval extremum: {}".format(max(reversed_table[bar+1:t3_candidate_index])))
-       print(reversed_table[bar+1:t3_candidate_index])
-       print("____next is____")
-       print(reversed_table[t3_candidate_index+1])
-    
-    if start == reversed_table[0]:
-        print("AAAA")
-        print(reversed_table[0])
-
+LOW = '<LOW>'
+HIGH = '<HIGH>'
 
 def algorithm_t1(table):
     start = 0
+    p_t1 = None
+    p_t3 = None
+    p_t2 = None
+    p_t4 = None
+    by_low = False
     while True:
-        iter = approve_t1(table, start)
-        if iter:
-            return iter
-        else:
-            # TODO: Проверить количество итераций по ТЗ
-            start += 1
-
-
-def approve_t1(table, start):
-    t1 = table.iloc[start]
-    if float(t1['<OPEN>']) < float(t1['<CLOSE>']):
-        # HIGH точка
-        # Ищем по LOW
-        p_t1 = find_potential_t1_down(table, start+1)
-        p_t3 = find_potential_t1_down(table, p_t1+1)
-        p_t2 = find_potential_t1_up(table, p_t1+1)
-        p_t4 = find_potential_t1_up(table, p_t2+1)
-        if p_t2:
-            # TODO: Проверить т3 на пробитие уровня т1
-            #MARK: - stupid unproven breakdown check for HIGH t1
-            # for bar in table[p_t1:p_t3]:
-                # if table['<CLOSE>'][bar] < table["<OPEN>"][bar]:
-                    # if table['<OPEN>'][bar] > np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        # continue
-                    # else:
-                        # print("[t3:t1] is broken down, search for another t3")
-                # else: 
-                    # if table['<CLOSE>'][bar] > np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        # continue
-                    # else:
-                        # print("[t3:t1] is broken down, search for another t3")
-
-            # MARK: 
-            return {
-                't1': {
-                    'LOW': p_t1,
-                    'HIGH': None
-                },
-                't3': {
-                    'LOW': p_t3,
-                    'HIGH': None
-                },
-                't2': {
-                    'LOW': None,
-                    'HIGH': p_t2
-                },
-                't4': {
-                    'LOW': None,
-                    'HIGH': p_t4
-                }
-            }
-        else:
-            # TODO: Не нашел t2
-            return False
-    else:
-        # LOW точка
-        # Ищем по HIGH
-        p_t1 = find_potential_t1_up(table, start+1)
-        p_t3 = find_potential_t1_up(table, p_t1+1)
-        p_t2 = find_potential_t1_down(table, p_t1+1)
-        p_t4 = find_potential_t1_down(table, p_t2+1)
-        if p_t2:
-            # TODO: Проверить т3 на пробитие уровня т1
-            # MARK: - stupid unproven breakdown check for LOW t1
-            # for bar in table[p_t1:p_t3]:
-                # if table['<CLOSE>'][bar] < table["<OPEN>"][bar]:
-                    # if table['<CLOSE>'][bar] < np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        # continue
-                    # else:
-                        # print("[t3:t1] is broken down, search for another t3")
-                # else: 
-                    # if table['<OPEN>'][bar] < np.quantile(table[p_t1:p_t3], 1/bar+1):
-                        # continue
-                    # else:
-                        # print("[t3:t1] is broken down, search for another t3")
-                        # 
-            return {
-                't1': {
-                    'LOW': None,
-                    'HIGH': p_t1
-                },
-                't3': {
-                    'LOW': None,
-                    'HIGH': p_t3
-                },
-                't2': {
-                    'LOW': p_t2,
-                    'HIGH': None
-                },
-                't4': {
-                    'LOW': p_t4,
-                    'HIGH': None
-                }
-            }
-        else:
-            # TODO: Не нашел t2
-            return False
-
-
-def is_aligned_low(table, t1, t2):
-    if table.iloc[t1]['<LOW>'] < table.iloc[t2]['<LOW>']:
-        return True
-    else:
-        return False
-
-
-def is_aligned_high(table, t1, t2):
-    if table.iloc[t1]['<HIGH>'] > table.iloc[t2]['<HIGH>']:
-        return True
-    else:
-        return False
-
-
-def find_potential_t1_up(table, start):
-    iter = table.iterrows()
-    for count, (index, row) in enumerate(iter):
-        if count < start: continue
         try:
-            if float(row['<HIGH>']) > float(table.iloc[count+1]['<HIGH>']):
-                if not is_aligned_high(table, count-1, count):
-                    return count
+            if float(table.iloc[start+1][HIGH]) < float(table.iloc[start][HIGH]):
+                # Search for the lowest
+                by_low = True
+                p_t1 = find_low_extremum(table, start+1)
+                intersection = find_level_of_intersection(table, p_t1, LOW)
+                if intersection:
+                    # Поиск экстремума на участке
+                    p_t3 = find_interval_extremum(table, p_t1+1, intersection-1, LOW)
+                    if p_t3:
+                        p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH)
+                        p_t4 = find_high_extremum(table, p_t2+1)
+                        while True:
+                            if p_t4 == False or table.iloc[p_t4][HIGH] > table.iloc[p_t2][HIGH]:
+                                break
+                            p_t4 = find_high_extremum(table, p_t4+1)
+                        if p_t4 == False:
+                            # new p3
+                            # заглушка
+                            p_t4 = find_high_extremum(table, p_t4+1)
+                        else:
+                            # p_t3 = find_interval_extremum(table, p_t1+1, p_t4-1, LOW)
+                            break
+                    else:
+                        start += 1
+                else:
+                    # Поиск экстремума справа налево по p_t1
+                    p_t3 = find_low_extremum(table, p_t1+1)
+                    if p_t3:
+                        p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH)
+                        # Поиск точки 4
+                        p_t4 = find_high_extremum(table, p_t2+1)
+                        while True:
+                            if p_t4 == False or table.iloc[p_t4][HIGH] > table.iloc[p_t2][HIGH]:
+                                break
+                            p_t4 = find_high_extremum(table, p_t4+1)
+                        if p_t4 == False:
+                            # new p3
+                            # заглушка
+                            p_t4 = find_high_extremum(table, p_t4+1)
+                        else:
+                            # p_t3 = find_interval_extremum(table, p_t1+1, p_t4-1, LOW)
+                            break
+                    else:
+                        start += 1
+            else:
+                # Search for the highest
+                by_low = False
+                p_t1 = find_high_extremum(table, start+1)
+                intersection = find_level_of_intersection(table, p_t1, HIGH)
+                if intersection:
+                    # Поиск экстремума на участке
+                    p_t3 = find_interval_extremum(table, p_t1+1, intersection-1, HIGH)
+                    if p_t3:
+                        p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, LOW)
+                        # Поиск точки 4
+                        p_t4 = find_low_extremum(table, p_t2+1)
+                        while True:
+                            if p_t4 == False or table.iloc[p_t4][LOW] < table.iloc[p_t2][LOW]:
+                                break
+                            p_t4 = find_low_extremum(table, p_t4+1)
+                        if p_t4 == False:
+                            # new p3
+                            # заглушка
+                            p_t4 = find_low_extremum(table, p_t4+1)
+                        else:
+                            # p_t3 = find_interval_extremum(table, p_t1+1, p_t4-1, LOW)
+                            break
+                    else:
+                        start += 1
+                else:
+                    # Поиск экстремума справа налево по p_t1
+                    p_t3 = find_high_extremum(table, p_t1+1)
+                    if p_t3:
+                        p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, LOW)
+                        # Поиск точки 4
+                        p_t4 = find_low_extremum(table, p_t2+1)
+                        while True:
+                            if p_t4 == False or table.iloc[p_t4][LOW] < table.iloc[p_t2][LOW]:
+                                break
+                            p_t4 = find_low_extremum(table, p_t4+1)
+                        print(p_t4 )
+                        if p_t4 == False:
+                            # new p3
+                            # заглушка
+                            p_t4 = find_low_extremum(table, p_t4+1)
+                        else:
+                            # p_t3 = find_interval_extremum(table, p_t1+1, p_t4-1, LOW)
+                            break
+                    else:
+                        start += 1
+        except Exception:
+            print('Error')
+            return
+    return {
+        't1': {
+            'LOW': p_t1 if by_low else None,
+            'HIGH': None if by_low else p_t1
+        },
+        't3': {
+            'LOW': p_t3 if by_low else None,
+            'HIGH': None if by_low else p_t3
+        },
+        't2': {
+            'LOW': None if by_low else p_t2,
+            'HIGH': p_t2 if by_low else None
+        },
+        't4': {
+            'LOW': None if by_low else p_t4,
+            'HIGH': p_t4 if by_low else None
+        }
+    }
+
+
+def find_interval_extremum(table, from_point, to_point, direction):
+    extremum = table.iloc[from_point][direction]
+    ext_index = 0
+    for i, (index, row) in enumerate(table.iterrows()):
+        if i < from_point: continue
+        if i > to_point: break
+        if direction == LOW:
+            if row[LOW] < extremum:
+                extremum = row[LOW]
+                ext_index = i
+        else:
+            if row[HIGH] > extremum:
+                extremum = row[HIGH]
+                ext_index = i
+    return ext_index
+
+
+def find_high_extremum(table, start_point):
+    last_extremum = 0
+    iterator = table.iterrows()
+    for i, (index, row) in enumerate(iterator):
+        if i < start_point: continue
+        try:
+            if float(table.iloc[i+1][HIGH]) < float(row[HIGH]) and float(table.iloc[i-1][HIGH]) < float(row[HIGH]):
+                if row[HIGH] < table.iloc[last_extremum][HIGH]:
+                    return last_extremum
+                else:
+                    last_extremum = i
         except Exception:
             return False
 
 
-def find_potential_t1_down(table, start):
-    iter = table.iterrows()
-    for count, (index, row) in enumerate(iter):
-        if count < start: continue
+def find_low_extremum(table, start_point):
+    last_extremum = None
+    iterator = table.iterrows()
+    for i, (index, row) in enumerate(iterator):
+        if i < start_point: continue
         try:
-            if float(row['<LOW>']) < float(table.iloc[count+1]['<LOW>']):
-                if not is_aligned_low(table, count-1, count):
-                    return count
+            if table.iloc[i+1][LOW] > row[LOW] and table.iloc[i-1][LOW] > row[LOW]:
+                if last_extremum is not None and row[LOW] > table.iloc[last_extremum][LOW]:
+                    return last_extremum
+                else:
+                    last_extremum = i
         except Exception:
             return False
+
+
+def find_level_of_intersection(table, level_point, direction):
+    iterator = table.iterrows()
+    for i, (index, row) in enumerate(iterator):
+        if i < level_point+1: continue
+        if i - level_point+1 > 49: return False
+        if direction == LOW:
+            if row[LOW] < table.iloc[level_point][LOW]:
+                return i
+        if direction == HIGH:
+            if row[HIGH] > table.iloc[level_point][HIGH]:
+                return i
+        return False
+

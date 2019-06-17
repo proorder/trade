@@ -20,6 +20,11 @@
 <body>
   <div>
     Масштаб: <button onClick="prevSize()">-</button><button onClick="nextSize()">+</button>
+    <form  method="post" enctype="multipart/form-data" action="/upload/">
+      {% csrf_token %}
+      <input type="file" name="csv">
+      <button type="submit">Отправить</button>
+    </form>
   </div>
   <canvas id="cv"></canvas>
 </body>

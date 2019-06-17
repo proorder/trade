@@ -2,8 +2,8 @@ const OPEN = 0;
 const HIGH = 1;
 const LOW = 2;
 const CLOSE = 3;
-let BAR_MARGIN = 8;
-let BAR_WIDTH = 11;
+let BAR_MARGIN = 1;
+let BAR_WIDTH = 3;
 const VERTICAL_OFFSET = 40;
 var graph;
 
@@ -19,10 +19,9 @@ class Graph {
     this.sourceIndex = 0;
 
     this.ctx = canvas.getContext('2d');
-    this.drawGraph();
+    this.ctx.clearRect(0, 0, this.width, this.height);
 
     this.addBars(csv);
-    this.drawLine(points);
   }
 
   addBars(source) {
@@ -51,6 +50,8 @@ class Graph {
   }
 
   drawBars() {
+    this.ctx.fillStyle = 'rgb(247, 247, 247)';
+    this.ctx.fillRect(0, 0, this.width, this.height);
     for (let a = 0; a < this.bars.length; a++) {
       let bar = this.bars[a];
       this.ctx.save();
@@ -65,11 +66,13 @@ class Graph {
         0, 4);
       this.ctx.restore();
       this.ctx.beginPath();
+      /*
       if (bar.uprising) {
         this.ctx.strokeStyle = "rgb(28, 209, 88)";
       } else {
         this.ctx.strokeStyle = "rgb(255, 69, 58)";
       }
+      */
       this.ctx.moveTo(bar.x + this.getBarWidth() / 2, bar.y + 0.5);
       this.ctx.lineTo(
         bar.x + this.getBarWidth() / 2,
@@ -94,11 +97,13 @@ class Graph {
         );
       }
       this.ctx.beginPath();
+      /*
       if (bar.uprising) {
         this.ctx.strokeStyle = "rgb(28, 209, 88)";
       } else {
         this.ctx.strokeStyle = "rgb(255, 69, 58)";
       }
+      */
       this.ctx.moveTo(bar.x + this.getBarWidth() / 2, bar.y - bar.low - bar.body + 0.5);
       this.ctx.lineTo(
         bar.x + this.getBarWidth() / 2,
@@ -106,6 +111,8 @@ class Graph {
       );
       this.ctx.stroke();
     }
+    this.drawGraph();
+    this.drawLine(points);
   }
 
   redraw() {
@@ -120,6 +127,7 @@ class Graph {
       let t3 = this.bars[points.t3.HIGH];
       let t2 = this.bars[points.t2.LOW];
       let t4 = this.bars[points.t4.LOW];
+      let t1_point;
       this.ctx.strokeStyle = "rgb(0, 83, 138)";
       this.ctx.moveTo(
         t1.x + this.getBarWidth() / 2,
@@ -143,14 +151,29 @@ class Graph {
       let t3 = this.bars[points.t3.LOW];
       let t2 = this.bars[points.t2.HIGH];
       let t4 = this.bars[points.t4.HIGH];
+
+      let t1t3h = Math.abs(t1.y - t3.y);
+      let t1t3w = (t1.x + this.getBarWidth() / 2) - (t3.x + this.getBarWidth() / 2);
+      let t1t3b = this.width - (t3.x + this.getBarWidth() / 2);
+
+      let t2t4h = Math.abs(
+        (t2.y - t2.low - t2.body - t2.high) -
+        (t4.y - t4.low - t4.body - t4.high)
+      );
+      let t2t4w = Math.abs(
+        (t2.x + this.getBarWidth() / 2) -
+        (t4.x + this.getBarWidth() / 2)
+      );
+      let t2t4b = this.width - (t4.x + this.getBarWidth() / 2);
+
       this.ctx.strokeStyle = "rgb(0, 83, 138)";
       this.ctx.moveTo(
-        t1.x + this.getBarWidth() / 2,
-        t1.y + 0.5
+        this.width,
+        t3.y + t1t3b * Math.tan(t1t3h/t1t3w) + 0.5
       );
       this.ctx.lineTo(
-        t3.x + this.getBarWidth() / 2,
-        t3.y + 0.5
+        0,
+        t1.y - this.width * Math.tan(t1t3h/t1t3w) + 0.5
       );
       this.ctx.moveTo(
         t2.x + this.getBarWidth() / 2,
@@ -167,9 +190,6 @@ class Graph {
   createBar(data, i, index) {
     let bar = {};
     bar.x = this.width - i * this.getBarWidth() - this.getBarWidth();
-    if (data[LOW] === this.low) {
-      console.log(this.low);
-    }
     bar.y = this.height - ( (data[LOW] - this.low) * this.heightCoeff ) - VERTICAL_OFFSET;
     bar.date = data[4];
 
@@ -217,11 +237,9 @@ class Graph {
 
   drawGraph() {
     this.ctx.beginPath();
-    this.ctx.fillStyle = 'rgb(247, 247, 247)';
-    this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.lineWidth = 1;
-    this.ctx.moveTo(5.5, 0);
-    this.ctx.lineTo(5.5, this.height - 5.5);
+    this.ctx.moveTo(0.5, 0);
+    this.ctx.lineTo(0.5, this.height - 5.5);
     this.ctx.lineTo(this.width, this.height - 5.5);
     this.ctx.stroke();
   }
