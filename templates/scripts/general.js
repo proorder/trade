@@ -246,7 +246,7 @@ class Graph {
 
   setSize() {
     // this.canvas.width = this.canvas.parentNode.clientWidth;
-    this.canvas.width = 700;
+    this.canvas.width = 900;
     this.canvas.height = 500;
   }
 }

@@ -2,7 +2,7 @@ from django.views.generic import View
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 import pandas as pd, json
-from .algorithms2 import algorithm_t1
+from .algorithms import algorithm_t1
 
 
 def upload_file(request):
@@ -12,7 +12,7 @@ def upload_file(request):
 
 
 def handle_uploaded_file(f):
-    with open('static/EURUSDE.csv', 'wb+') as destination:
+    with open('static/EURUSD.csv', 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
@@ -21,7 +21,7 @@ class MainView(View):
     def getCSVJSON(self):
         table = pd.read_csv('static/EURUSD.csv')
         output = []
-        self.points = algorithm_t1(table.iloc[::-1])
+        self.points = algorithm_t1(table)
         for index, row in table.iterrows():
             output.append([
                     row['<OPEN>'],
