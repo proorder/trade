@@ -2,7 +2,7 @@ LOW = '<LOW>'
 HIGH = '<HIGH>'
 
 
-def algorithm_t1(table):
+def algorithm_t1(table, start):
     p_t1 = None
     p_t3 = None
     p_t2 = None
@@ -12,7 +12,7 @@ def algorithm_t1(table):
     while True:
         # На шаг ближе к декларативному стилю
         # Бывшая переменная start идет в ад, теперь все в параметре
-        p_t1, intersection, by_low = find_p1(table, 0)
+        p_t1, intersection, by_low = find_p1(table, start)
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
         break
     return {

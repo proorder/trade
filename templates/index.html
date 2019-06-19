@@ -5,11 +5,6 @@
   <title>TradeView</title>
   <script>
     var csv = {{ csv }};
-    var points = {{ points|safe }};
-  </script>
-  <script>
-    {% include "scripts/general.js" %}
-    {% include "scripts/main.js" %}
   </script>
   <style>
     body {
@@ -27,5 +22,9 @@
     </form>
   </div>
   <canvas id="cv"></canvas>
+  <script>
+    {% include "scripts/main.js" %}
+    {% include "scripts/general.js" %}
+  </script>
 </body>
 </html>

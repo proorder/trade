@@ -1,3 +1,11 @@
+let COOKIE = {};
+let split_cookie = document.cookie.split(';');
+for (let i in split_cookie) {
+  let cook = split_cookie[i].trim().split('=');
+  COOKIE[cook[0]] = cook[1];
+}
+const csrftoken = COOKIE['csrftoken'];
+
 function prevSize() {
   BAR_MARGIN -= 2;
   BAR_WIDTH -= 2;
@@ -23,4 +31,20 @@ function find_diagonal_height(point_1, point_2, DIAGONAL_WIDTH) {
       y: point_1.y + result_h_1
     }
   }
+}
+
+
+function post (url, options) {
+  const defaults = {
+    method: 'POST',
+    credentials: 'include',
+    headers: new Headers({
+      'X-CSRFToken': csrftoken,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }),
+    body: JSON.stringify(options)
+  }
+  // const merged = merge(options, defaults)
+  return fetch(url, defaults);
 }

@@ -33,6 +33,20 @@ class Graph {
     this.canvas.addEventListener('mouseout', event => {
       delete this.crossX;
     });
+    this.canvas.addEventListener('click', () => {
+      if (this.crossX !== undefined) {
+        let id = this.source.length - 1 - this.crossX.x
+        post('select/', { id })
+          .then(body => body.json())
+          .then(res => {
+            console.log(res);
+            if (res.t1 !== undefined && res.t3 !== undefined) {
+              this.points = res;
+              // this.redraw();
+            }
+          });
+      }
+    });
 
     var requestId = requestAnimationFrame(this.redraw.bind(this));
 
@@ -145,7 +159,9 @@ class Graph {
     this.ctx.clearRect(0, 0, HORIZONTAL_OFFSET, this.height);
     this.ctx.clearRect(this.width - HORIZONTAL_OFFSET, 0, HORIZONTAL_OFFSET, this.height);
     this.drawGraph();
-    this.drawLine(points);
+    if (this.points !== undefined) {
+      this.drawLine(this.points);
+    }
   }
 
   redraw() {
