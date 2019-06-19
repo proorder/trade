@@ -2,8 +2,8 @@ const OPEN = 0;
 const HIGH = 1;
 const LOW = 2;
 const CLOSE = 3;
-let BAR_MARGIN = 1;
-let BAR_WIDTH = 3;
+let BAR_MARGIN = 3;
+let BAR_WIDTH = 5;
 const VERTICAL_OFFSET = 40;
 var graph;
 
@@ -13,32 +13,46 @@ class Graph {
     this.setSize();
     this.width = canvas.clientWidth;
     this.height = canvas.clientHeight;
+    let {x, y} = this.canvas.getBoundingClientRect();
+    this.x = x;
+    this.y = y;
     this.scaleCoeff = 1;
     this.source = [];
     this.bars = [];
-    this.sourceIndex = 0;
+    this.sourceIndex = 9;
 
     this.ctx = canvas.getContext('2d');
     this.ctx.clearRect(0, 0, this.width, this.height);
+    this.canvas.addEventListener('mousemove', event => {
+      this.crossX = {
+        x: event.clientX - this.x,
+        y: event.clientY - this.y
+      };
+    });
+    this.canvas.addEventListener('mouseout', event => {
+      delete this.crossX;
+    });
+
+    var requestId = requestAnimationFrame(this.redraw.bind(this));
 
     this.addBars(csv);
   }
 
   addBars(source) {
     this.source = source;
-    this.heightCoeff  = this.findHeightCoeff();
     this.defineBars();
-    this.drawBars();
+    // this.drawBars();
   }
 
   defineBars() {
+    this.heightCoeff  = this.findHeightCoeff();
     this.bars = [];
     let barsCount = Math.ceil( this.width / this.getBarWidth() );
     if (this.source.length - this.sourceIndex < barsCount) {
       barsCount = this.source.length - this.sourceIndex;
     }
 
-    for (let i = this.sourceIndex; i < barsCount; i++) {
+    for (let i = this.sourceIndex; i < barsCount + this.sourceIndex; i++) {
       this.bars.push(
         this.createBar(
           this.source[this.source.length - 1 - i],
@@ -47,6 +61,15 @@ class Graph {
         )
       );
     }
+  }
+
+  drawX() {
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.crossX.x, 0);
+    this.ctx.lineTo(this.crossX.x, this.height);
+    this.ctx.moveTo(0, this.crossX.y);
+    this.ctx.lineTo(this.width, this.crossX.y);
+    this.ctx.stroke();
   }
 
   drawBars() {
@@ -65,6 +88,7 @@ class Graph {
         + "LOW: " + this.source[this.source.length - 1 - a][LOW] + "     ",
         0, 4);
       this.ctx.restore();
+      /*
       this.ctx.beginPath();
       /*
       if (bar.uprising) {
@@ -119,6 +143,12 @@ class Graph {
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.defineBars();
     this.drawBars();
+    if (this.crossX !== undefined) {
+      this.drawX();
+    }
+    setTimeout(() => {
+      requestAnimationFrame(this.redraw.bind(this));
+    });
   }
 
   drawLine(points) {
@@ -128,6 +158,25 @@ class Graph {
       let t2 = this.bars[points.t2.LOW];
       let t4 = this.bars[points.t4.LOW];
       let t1_point;
+
+      let {point_1, point_2} = find_diagonal_height(
+        {x: t1.x + this.getBarWidth() / 2, y: t1.y - t1.low - t1.body - t1.high},
+        {x: t3.x + this.getBarWidth() / 2, y: t3.y - t3.low - t3.body - t3.high},
+        this.width
+      );
+      /*
+      console.log(point_1, point_2);
+      this.ctx.strokeStyle = "rgb(0, 83, 138)";
+      this.ctx.moveTo(
+        point_1.x,
+        point_1.y + 0.5
+      );
+      this.ctx.lineTo(
+        point_2.x,
+        point_2.y + 0.5
+      );
+      */
+
       this.ctx.strokeStyle = "rgb(0, 83, 138)";
       this.ctx.moveTo(
         t1.x + this.getBarWidth() / 2,
@@ -137,6 +186,7 @@ class Graph {
         t3.x + this.getBarWidth() / 2,
         t3.y - t3.low - t3.body - t3.high + 0.5
       );
+      /*
       this.ctx.moveTo(
         t2.x + this.getBarWidth() / 2,
         t2.y + 0.5
@@ -145,6 +195,7 @@ class Graph {
         t4.x + this.getBarWidth() / 2,
         t4.y + 0.5
       );
+      */
       this.ctx.stroke();
     } else {
       let t1 = this.bars[points.t1.LOW];
@@ -156,6 +207,7 @@ class Graph {
       let t1t3w = (t1.x + this.getBarWidth() / 2) - (t3.x + this.getBarWidth() / 2);
       let t1t3b = this.width - (t3.x + this.getBarWidth() / 2);
 
+      /*
       let t2t4h = Math.abs(
         (t2.y - t2.low - t2.body - t2.high) -
         (t4.y - t4.low - t4.body - t4.high)
@@ -165,6 +217,7 @@ class Graph {
         (t4.x + this.getBarWidth() / 2)
       );
       let t2t4b = this.width - (t4.x + this.getBarWidth() / 2);
+      */
 
       this.ctx.strokeStyle = "rgb(0, 83, 138)";
       this.ctx.moveTo(
@@ -175,6 +228,7 @@ class Graph {
         0,
         t1.y - this.width * Math.tan(t1t3h/t1t3w) + 0.5
       );
+      /*
       this.ctx.moveTo(
         t2.x + this.getBarWidth() / 2,
         t2.y - t2.low - t2.body - t2.high + 0.5
@@ -183,13 +237,14 @@ class Graph {
         t4.x + this.getBarWidth() / 2,
         t4.y - t4.low - t4.body - t4.high + 0.5
       );
+      */
       this.ctx.stroke();
     }
   }
 
   createBar(data, i, index) {
     let bar = {};
-    bar.x = this.width - i * this.getBarWidth() - this.getBarWidth();
+    bar.x = this.width - (i - this.sourceIndex) * this.getBarWidth() - this.getBarWidth();
     bar.y = this.height - ( (data[LOW] - this.low) * this.heightCoeff ) - VERTICAL_OFFSET;
     bar.date = data[4];
 
