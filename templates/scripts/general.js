@@ -39,7 +39,6 @@ class Graph {
         post('select/', { id })
           .then(body => body.json())
           .then(res => {
-            console.log(res);
             if (res.t1 !== undefined && res.t3 !== undefined) {
               this.points = res;
               // this.redraw();
