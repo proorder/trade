@@ -5,6 +5,7 @@ const CLOSE = 3;
 let BAR_MARGIN = 3;
 let BAR_WIDTH = 5;
 const VERTICAL_OFFSET = 40;
+const HORIZONTAL_OFFSET = 50;
 var graph;
 
 class Graph {
@@ -19,14 +20,14 @@ class Graph {
     this.scaleCoeff = 1;
     this.source = [];
     this.bars = [];
-    this.sourceIndex = 9;
+    this.sourceIndex = 10;
 
     this.ctx = canvas.getContext('2d');
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.canvas.addEventListener('mousemove', event => {
       this.crossX = {
-        x: event.clientX - this.x,
-        y: event.clientY - this.y
+        x: Math.floor((this.width - HORIZONTAL_OFFSET - (event.clientX - this.x)) / this.getBarWidth() + this.sourceIndex),
+        y: event.clientY - this.y + 0.5
       };
     });
     this.canvas.addEventListener('mouseout', event => {
@@ -41,18 +42,18 @@ class Graph {
   addBars(source) {
     this.source = source;
     this.defineBars();
-    // this.drawBars();
+    this.drawBars();
   }
 
   defineBars() {
     this.heightCoeff  = this.findHeightCoeff();
     this.bars = [];
-    let barsCount = Math.ceil( this.width / this.getBarWidth() );
+    let barsCount = Math.ceil( (this.width - HORIZONTAL_OFFSET*2) / this.getBarWidth() );
     if (this.source.length - this.sourceIndex < barsCount) {
       barsCount = this.source.length - this.sourceIndex;
     }
 
-    for (let i = this.sourceIndex; i < barsCount + this.sourceIndex; i++) {
+    for (let i = Math.floor(this.sourceIndex); i < barsCount + this.sourceIndex; i++) {
       this.bars.push(
         this.createBar(
           this.source[this.source.length - 1 - i],
@@ -65,11 +66,18 @@ class Graph {
 
   drawX() {
     this.ctx.beginPath();
-    this.ctx.moveTo(this.crossX.x, 0);
-    this.ctx.lineTo(this.crossX.x, this.height);
-    this.ctx.moveTo(0, this.crossX.y);
-    this.ctx.lineTo(this.width, this.crossX.y);
+    this.ctx.moveTo(
+      this.width - ((this.crossX.x-this.sourceIndex)*this.getBarWidth()) - HORIZONTAL_OFFSET - this.getBarWidth()/2,
+      0
+    );
+    this.ctx.lineTo(
+      this.width - ((this.crossX.x-this.sourceIndex)*this.getBarWidth()) - HORIZONTAL_OFFSET - this.getBarWidth()/2,
+      this.height
+    );
+    this.ctx.moveTo(HORIZONTAL_OFFSET, this.crossX.y);
+    this.ctx.lineTo(this.width - HORIZONTAL_OFFSET, this.crossX.y);
     this.ctx.stroke();
+    this.ctx.fillText(this.crossX.x, this.width - HORIZONTAL_OFFSET + 10, this.crossX.y);
   }
 
   drawBars() {
@@ -90,7 +98,6 @@ class Graph {
       this.ctx.restore();
       /*
       this.ctx.beginPath();
-      /*
       if (bar.uprising) {
         this.ctx.strokeStyle = "rgb(28, 209, 88)";
       } else {
@@ -135,6 +142,8 @@ class Graph {
       );
       this.ctx.stroke();
     }
+    this.ctx.clearRect(0, 0, HORIZONTAL_OFFSET, this.height);
+    this.ctx.clearRect(this.width - HORIZONTAL_OFFSET, 0, HORIZONTAL_OFFSET, this.height);
     this.drawGraph();
     this.drawLine(points);
   }
@@ -148,7 +157,7 @@ class Graph {
     }
     setTimeout(() => {
       requestAnimationFrame(this.redraw.bind(this));
-    });
+    }, 10);
   }
 
   drawLine(points) {
@@ -244,7 +253,7 @@ class Graph {
 
   createBar(data, i, index) {
     let bar = {};
-    bar.x = this.width - (i - this.sourceIndex) * this.getBarWidth() - this.getBarWidth();
+    bar.x = this.width - (i - this.sourceIndex) * this.getBarWidth() - this.getBarWidth() - HORIZONTAL_OFFSET;
     bar.y = this.height - ( (data[LOW] - this.low) * this.heightCoeff ) - VERTICAL_OFFSET;
     bar.date = data[4];
 
@@ -269,7 +278,7 @@ class Graph {
     let minHeightIndex = 0;
     let maxHeightIndex = 0;
     let maxHeight = 0;
-    let minHeight = this.source[this.source.length - 1 - this.sourceIndex][LOW];
+    let minHeight = this.source[this.source.length - 1 - Math.floor(this.sourceIndex)][LOW];
 
     for (let i = this.sourceIndex; i < barsCount; i++) {
       let a = this.source.length - 1 - this.sourceIndex - i;
@@ -293,9 +302,9 @@ class Graph {
   drawGraph() {
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
-    this.ctx.moveTo(0.5, 0);
-    this.ctx.lineTo(0.5, this.height - 5.5);
-    this.ctx.lineTo(this.width, this.height - 5.5);
+    this.ctx.moveTo(HORIZONTAL_OFFSET - 0.5, 0);
+    this.ctx.lineTo(HORIZONTAL_OFFSET - 0.5, this.height - 0.5);
+    this.ctx.lineTo(this.width - HORIZONTAL_OFFSET - 0.5, this.height - 0.5);
     this.ctx.stroke();
   }
 
