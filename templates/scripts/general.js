@@ -20,7 +20,7 @@ class Graph {
     this.scaleCoeff = 1;
     this.source = [];
     this.bars = [];
-    this.sourceIndex = 10;
+    this.sourceIndex = 0;
 
     this.ctx = canvas.getContext('2d');
     this.ctx.clearRect(0, 0, this.width, this.height);
