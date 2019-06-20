@@ -36,6 +36,7 @@ class Graph {
     this.canvas.addEventListener('click', () => {
       if (this.crossX !== undefined) {
         let id = this.source.length - 1 - this.crossX.x
+        console.log(id);
         post('select/', { id })
           .then(body => body.json())
           .then(res => {
@@ -177,10 +178,10 @@ class Graph {
 
   drawLine(points) {
     if (points.t1.LOW === null) {
-      let t1 = this.bars[this.source.length - points.t1.HIGH];
-      let t3 = this.bars[this.source.length - points.t3.HIGH];
-      let t2 = this.bars[this.source.length - points.t2.LOW];
-      let t4 = this.bars[this.source.length - points.t4.LOW];
+      let t1 = this.bars[this.source.length - points.t1.HIGH - 1];
+      let t3 = this.bars[this.source.length - points.t3.HIGH - 1];
+      let t2 = this.bars[this.source.length - points.t2.LOW - 1];
+      let t4 = this.bars[this.source.length - points.t4.LOW - 1];
       let t1_point;
 
       let {point_1, point_2} = find_diagonal_height(
@@ -222,10 +223,10 @@ class Graph {
       */
       this.ctx.stroke();
     } else {
-      let t1 = this.bars[this.source.length - points.t1.LOW];
-      let t3 = this.bars[this.source.length - points.t3.LOW];
-      let t2 = this.bars[this.source.length - points.t2.HIGH];
-      let t4 = this.bars[this.source.length - points.t4.HIGH];
+      let t1 = this.bars[this.source.length - points.t1.LOW - 1];
+      let t3 = this.bars[this.source.length - points.t3.LOW - 1];
+      let t2 = this.bars[this.source.length - points.t2.HIGH - 1];
+      let t4 = this.bars[this.source.length - points.t4.HIGH - 1];
 
       let t1t3h = Math.abs(t1.y - t3.y);
       let t1t3w = (t1.x + this.getBarWidth() / 2) - (t3.x + this.getBarWidth() / 2);

@@ -1,3 +1,4 @@
+INTERSECTION_DEPTH = 49
 LOW = '<LOW>'
 HIGH = '<HIGH>'
 
@@ -13,8 +14,10 @@ def algorithm_t1(table, start):
         # На шаг ближе к декларативному стилю
         # Бывшая переменная start идет в ад, теперь все в параметре
         p_t1, intersection, by_low = find_p1(table, start)
+        if not p_t1:
+            start += 1
+            continue
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
-        break
     return {
         't1': {
             'LOW': p_t1 if by_low else None,
@@ -36,17 +39,22 @@ def algorithm_t1(table, start):
         
 
 def find_p1(table, start):
+    by_low = True
+    p_t1 = None
+    intersection = None
     if float(table.iloc[start+1][HIGH]) < float(table.iloc[start][HIGH]):
-        by_low = True
         p_t1 = find_low_extremum(table, start+1)
         intersection = find_level_of_intersection(table, p_t1, LOW)
-        return p_t1, intersection, by_low
     else:
         by_low = False
         p_t1 = find_high_extremum(table, start+1)
         intersection = find_level_of_intersection(table, p_t1, HIGH)
-        return p_t1, intersection, by_low
-
+    if not intersection:
+        from_point = start - 50 if start - 50 > -1 else 0
+        extremum = find_interval_extremum(table, from_point, p_t1-1, HIGH if not by_low else LOW)
+        if not extremum:
+            return False, False, False
+    return p_t1, intersection, by_low
 
 def find_p3(table, p_t1, intersection, by_low):
     p_t3 = None
@@ -61,18 +69,20 @@ def find_p3(table, p_t1, intersection, by_low):
 
 def find_interval_extremum(table, from_point, to_point, direction):
     extremum = table.iloc[from_point][direction]
-    ext_index = 0
+    ext_index = False
     for i, (index, row) in enumerate(table.iterrows()):
         if i < from_point: continue
         if i > to_point: break
         if direction == LOW:
             if row[LOW] < extremum:
-                extremum = row[LOW]
-                ext_index = i
+                if row[LOW] < table.iloc[i-1][LOW] and row[LOW] < table.iloc[i+1][LOW]:
+                    extremum = row[LOW]
+                    ext_index = i
         else:
             if row[HIGH] > extremum:
-                extremum = row[HIGH]
-                ext_index = i
+                if row[HIGH] > table.iloc[i-1][HIGH] and row[HIGH] > table.iloc[i+1][HIGH]:
+                    extremum = row[HIGH]
+                    ext_index = i
     return ext_index
 
 
@@ -97,7 +107,7 @@ def find_low_extremum(table, start_point):
     for i, (index, row) in enumerate(iterator):
         if i < start_point: continue
         try:
-            if table.iloc[i+1][LOW] > row[LOW] and table.iloc[i-1][LOW] > row[LOW]:
+            if float(table.iloc[i+1][LOW]) > float(row[LOW]) and float(table.iloc[i-1][LOW]) > float(row[LOW]):
                 if last_extremum is not None and row[LOW] > table.iloc[last_extremum][LOW]:
                     return last_extremum
                 else:
@@ -114,10 +124,8 @@ def find_level_of_intersection(table, level_point, direction):
             row = table.iloc[i]
         except Exception:
             return False
-        if i < level_point+1:
-            i -= 1
-            continue
-        if i - level_point+1 > 49: return False
+        if i < 0: return False
+        if level_point - i > INTERSECTION_DEPTH: return False
         if direction == LOW:
             if row[LOW] < table.iloc[level_point][LOW]:
                 return i

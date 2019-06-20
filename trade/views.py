@@ -8,7 +8,6 @@ from .algorithms2 import algorithm_t1
 def select(request):
     post = json.loads(request.body.decode('utf-8'))
     table = pd.read_csv('static/EURUSD.csv')
-    print(table.shape[0])
     points = algorithm_t1(table, post['id'])
     return HttpResponse(json.dumps(points), content_type='application/json')
 
