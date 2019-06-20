@@ -11,20 +11,23 @@ def algorithm_t1(table, start):
     p_t4 = None
     intersection = None
     by_low = False
+
     while True:
         # На шаг ближе к декларативному стилю
         # Бывшая переменная start идет в ад, теперь все в параметре
         p_t1, intersection, by_low = find_p1(table, start)
         if not p_t1:
-            start += 1
+            start = p_t1
             continue
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
         if not p_t3:
             # TODO: Выяснить причины пропуска
-            start += 1
+            start = p_t1
             continue
-        p_t4 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
         break
+
+    p_t4 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
+
     return {
         't1': {
             'LOW': p_t1 if by_low else None,
@@ -65,6 +68,7 @@ def find_p1(table, start):
 
 def find_p3(table, p_t1, intersection, by_low):
     p_t3 = None
+    stop_point = None
     if by_low:
         p_t3 = find_low_extremum(table, p_t1+1)
         # Проверка преодоления т3
