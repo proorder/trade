@@ -20,8 +20,10 @@ def algorithm_t1(table, start):
             continue
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
         if not p_t3:
+            # TODO: Выяснить причины пропуска
             start += 1
             continue
+        break
     return {
         't1': {
             'LOW': p_t1 if by_low else None,
