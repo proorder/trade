@@ -23,6 +23,7 @@ def algorithm_t1(table, start):
             # TODO: Выяснить причины пропуска
             start += 1
             continue
+        p_t4 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
         break
     return {
         't1': {

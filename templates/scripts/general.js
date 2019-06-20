@@ -76,14 +76,15 @@ class Graph {
   }
 
   defineBars() {
+    const index = this.sourceIndex < 0 ? 0 : this.sourceIndex;
     this.heightCoeff = this.findHeightCoeff();
     this.bars = [];
     let barsCount = Math.ceil( (this.width - HORIZONTAL_OFFSET*2) / this.getBarWidth() );
-    if (this.source.length - this.sourceIndex < barsCount) {
-      barsCount = this.source.length - this.sourceIndex;
+    if (this.source.length - index < barsCount) {
+      barsCount = this.source.length - index;
     }
 
-    for (let i = Math.floor(this.sourceIndex); i < barsCount + this.sourceIndex; i++) {
+    for (let i = Math.floor(index); i < barsCount + index; i++) {
       this.bars.push(
         this.createBar(
           this.source[this.source.length - 1 - i],
@@ -115,6 +116,7 @@ class Graph {
     this.ctx.fillRect(0, 0, this.width, this.height);
     for (let a = 0; a < this.bars.length; a++) {
       let bar = this.bars[a];
+      /*
       this.ctx.save();
       this.ctx.translate(bar.x, this.height - 10);
       // this.ctx.fillStyle = "rgb(100, 210, 255)";
@@ -126,7 +128,6 @@ class Graph {
         + "LOW: " + this.source[this.source.length - 1 - a][LOW] + "     ",
         0, 4);
       this.ctx.restore();
-      /*
       this.ctx.beginPath();
       if (bar.uprising) {
         this.ctx.strokeStyle = "rgb(28, 209, 88)";
@@ -193,11 +194,12 @@ class Graph {
   }
 
   drawLine(points) {
+    const index = this.sourceIndex < 0 ? 0 : this.sourceIndex;
     if (points.t1.LOW === null) {
-      let t1 = this.bars[this.source.length - points.t1.HIGH - 1 - Math.floor(this.sourceIndex)];
-      let t3 = this.bars[this.source.length - points.t3.HIGH - 1 - Math.floor(this.sourceIndex)];
-      let t2 = this.bars[this.source.length - points.t2.LOW - 1 - Math.floor(this.sourceIndex)];
-      let t4 = this.bars[this.source.length - points.t4.LOW - 1 - Math.floor(this.sourceIndex)];
+      let t1 = this.bars[this.source.length - points.t1.HIGH - 1 - Math.floor(index)];
+      let t3 = this.bars[this.source.length - points.t3.HIGH - 1 - Math.floor(index)];
+      let t2 = this.bars[this.source.length - points.t2.LOW - 1 - Math.floor(index)];
+      let t4 = this.bars[this.source.length - points.t4.LOW - 1 - Math.floor(index)];
       let t1_point;
 
       let {point_1, point_2} = find_diagonal_height(
@@ -239,10 +241,10 @@ class Graph {
       */
       this.ctx.stroke();
     } else {
-      let t1 = this.bars[this.source.length - points.t1.LOW - 1 - Math.floor(this.sourceIndex)];
-      let t3 = this.bars[this.source.length - points.t3.LOW - 1 - Math.floor(this.sourceIndex)];
-      let t2 = this.bars[this.source.length - points.t2.HIGH - 1 - Math.floor(this.sourceIndex)];
-      let t4 = this.bars[this.source.length - points.t4.HIGH - 1 - Math.floor(this.sourceIndex)];
+      let t1 = this.bars[this.source.length - points.t1.LOW - 1 - Math.floor(index)];
+      let t3 = this.bars[this.source.length - points.t3.LOW - 1 - Math.floor(index)];
+      let t2 = this.bars[this.source.length - points.t2.HIGH - 1 - Math.floor(index)];
+      let t4 = this.bars[this.source.length - points.t4.HIGH - 1 - Math.floor(index)];
 
       let t1t3h = Math.abs(t1.y - t3.y);
       let t1t3w = (t1.x + this.getBarWidth() / 2) - (t3.x + this.getBarWidth() / 2);
@@ -303,6 +305,7 @@ class Graph {
   }
 
   findHeightCoeff() {
+    const index = this.sourceIndex < 0 ? 0 : this.sourceIndex;
     let barsCount = Math.ceil( this.width / this.getBarWidth() );
     if (this.source.length < barsCount) {
       barsCount = this.source.length;
@@ -310,10 +313,10 @@ class Graph {
     let minHeightIndex = 0;
     let maxHeightIndex = 0;
     let maxHeight = 0;
-    let minHeight = this.source[this.source.length - 1 - Math.floor(this.sourceIndex)][LOW];
+    let minHeight = this.source[this.source.length - 1 - Math.floor(index)][LOW];
 
-    for (let i = this.sourceIndex; i < barsCount; i++) {
-      let a = this.source.length - 1 - Math.floor(this.sourceIndex) - Math.floor(i);
+    for (let i = index; i < barsCount; i++) {
+      let a = this.source.length - 1 - Math.floor(index) - Math.floor(i);
       if (this.source[a][HIGH] > maxHeight) {
         maxHeight = this.source[a][HIGH];
         maxHeightIndex = a;
