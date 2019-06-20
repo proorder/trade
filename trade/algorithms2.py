@@ -1,3 +1,4 @@
+T1_T3_DEPTH = 150
 INTERSECTION_DEPTH = 49
 LOW = '<LOW>'
 HIGH = '<HIGH>'
@@ -18,6 +19,9 @@ def algorithm_t1(table, start):
             start += 1
             continue
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
+        if not p_t3:
+            start += 1
+            continue
     return {
         't1': {
             'LOW': p_t1 if by_low else None,
@@ -60,10 +64,16 @@ def find_p3(table, p_t1, intersection, by_low):
     p_t3 = None
     if by_low:
         p_t3 = find_low_extremum(table, p_t1+1)
-        # Проверка на пробитие т1
+        # Проверка преодоления т3
+        if table.iloc[p_t1][LOW] > table.iloc[p_t3][LOW]:
+            return False
     else:
         p_t3 = find_high_extremum(table, p_t1+1)
-        # Проверка на пробитие т1
+        # Проверка преодоления т3
+        if table.iloc[p_t1][HIGH] < table.iloc[p_t3][HIGH]:
+            return False
+    if p_t3 - p_t1 > T1_T3_DEPTH:
+        return False
     return p_t3
 
 
