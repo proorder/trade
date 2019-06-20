@@ -151,3 +151,8 @@ def find_level_of_intersection(table, level_point, direction):
                 return i
         i -= 1
 
+def find_trend_line_breakdown(table, p1, p2):
+    interval = table.iloc[p1:p2]
+    h = table.iloc[p2][LOW or HIGH] - table.iloc[p1][LOW or HIGH]
+    percent = (p2-p1)/100
+    return interval.loc[lambda el: el[LOW or HIGH] != (el.index-p1)/percent*h]

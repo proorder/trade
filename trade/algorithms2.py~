@@ -18,10 +18,12 @@ def algorithm_t1(table, start):
         p_t1, intersection, by_low = find_p1(table, start)
         if not p_t1:
             start = p_t1
+            continue
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
         if not p_t3:
             # TODO: Выяснить причины пропуска
             start = p_t1
+            continue
         break
 
     p_t4 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
