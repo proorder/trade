@@ -152,5 +152,5 @@ def find_trend_line_breakdown(table, p1, p2, direction):
     if direction == LOW:
         return interval.loc[lambda el: el[LOW] < (el.index-p1)/percent*h]
     else:
-        return interval.loc[lambda el: el[LOW] < (el.index-p1)/percent*h]
+        return interval.loc[lambda el: el[HIGH] < (el.index-p1)/percent*h]
 
