@@ -153,12 +153,11 @@ def find_trend_line_breakdown(table, p1, p2, direction):
     else:
         return interval.loc[lambda el: el[HIGH] < (el.index-p1)/percent*h]
 
-def base_fragmenting_extremums(table, t1, t3, direction):
+def bfe_by_low(table, t1, t3, direction):
     bfe = None # base fragmenting ext.
     lpi = None # level-priced intersection
     ext = None # bfe approving ext.
-    if direction == LOW:
-        for i in range(table.iloc[t1:t3]):
+    for i in range(table.iloc[t1:t3]):
             if table.iloc[i][LOW] < table.iloc[i+1][LOW]:
                 continue
             else:
@@ -185,8 +184,12 @@ def base_fragmenting_extremums(table, t1, t3, direction):
                 return print(find_interval_extremum(table, lpi, bfe, HIGH))
             else:
                 return print('there\'s no approving ext. => no bfe => t3 is ok')
-    else:
-        for i in range(table.iloc[t1:t3]):
+
+def bfe_by_high(table, t1, t3, direction):
+    bfe = None # base fragmenting ext.
+    lpi = None # level-priced intersection
+    ext = None # bfe approving ext.
+    for i in range(table.iloc[t1:t3]):
             if table.iloc[i][HIGH] > table.iloc[i+1][HIGH]:
                 continue
             else:
@@ -213,3 +216,10 @@ def base_fragmenting_extremums(table, t1, t3, direction):
                         return print(find_interval_extremum(table, lpi, bfe, LOW))
             else:
                 return print('there\'s no approving ext. => no bfe => t3 is ok')
+
+
+def base_fragmenting_extremums(table, t1, t3, direction):
+    if direction == LOW:
+        return bfe_by_low(table, t1, t3, direction)
+    else:
+        return bfe_by_high(table, t1, t3, direction)
