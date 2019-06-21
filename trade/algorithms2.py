@@ -144,14 +144,22 @@ def find_level_of_intersection(table, level_point, direction):
                 return i
         i -= 1
 
-def find_trend_line_breakdown(table, p1, p2, direction):
+def find_trend_line_breakdown(table, p1, p2, direction):    
     interval = table.iloc[p1:p2]
-    h = table.iloc[p2][direction] - table.iloc[p1][direction]
-    percent = (p2-p1)/100
+    a = []
     if direction == LOW:
-        return interval.loc[lambda el: el[LOW] < (el.index-p1)/percent*h]
+        extremum = table.iloc[p1][LOW]
+        h = table.iloc[p2][direction] - extremum
+        for i, el in interval.iterrows():
+            if el[LOW] - extremum < (el.name-p1)*math.tan(h/(p2-p1)):
+                a.append(i)
     else:
-        return interval.loc[lambda el: el[HIGH] < (el.index-p1)/percent*h]
+        extremum = table.iloc[p1][HIGH]
+        h = extremum - table.iloc[p2][HIGH]
+        for i, el in interval.iterrows():
+            if extremum - el[HIGH] < (el.name-p1)*math.tan(h/(p2-p1)):
+                a.append(i)
+    return a
 
 def bfe_by_low(table, t1, t3, direction):
     bfe = None # base fragmenting ext.

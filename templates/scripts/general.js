@@ -41,7 +41,7 @@ class Graph {
       delete this.crossX;
     });
     this.canvas.addEventListener('mouseup', () => {
-      if (Date.now() - mouseDownFired < 300) {
+      if (Date.now() - mouseDownFired < 100) {
         if (this.crossX !== undefined) {
           let id = this.source.length - 1 - this.crossX.x
           post('select/', { id })
@@ -108,7 +108,7 @@ class Graph {
     this.ctx.moveTo(HORIZONTAL_OFFSET, this.crossX.y);
     this.ctx.lineTo(this.width - HORIZONTAL_OFFSET, this.crossX.y);
     this.ctx.stroke();
-    this.ctx.fillText(this.crossX.x, this.width - HORIZONTAL_OFFSET + 10, this.crossX.y);
+    this.ctx.fillText(this.source.length - 1 - this.crossX.x, this.width - HORIZONTAL_OFFSET + 10, this.crossX.y);
   }
 
   drawBars() {
