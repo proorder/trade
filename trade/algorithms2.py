@@ -165,11 +165,11 @@ def bfe_by_low(table, t1, t3, direction):
     bfe = None # base fragmenting ext.
     lpi = None # level-priced intersection
     ext = None # bfe approving ext.
-    for i in range(table.iloc[t1:t3]):
-        if table.iloc[i][LOW] < table.iloc[i+1][LOW]:
+    for i in table.iloc[t1:t3].iterrows():
+        if float(table.iloc[i][LOW]) < float(table.iloc[i+1][LOW]):
             continue
         else:
-            if table.iloc[i+1][LOW] < table.iloc[i+2][LOW]:
+            if float(table.iloc[i+1][LOW]) < float(table.iloc[i+2][LOW]):
                 bfe = table.iloc[i+1] #bfe candidate
                 break
             else:
@@ -180,7 +180,7 @@ def bfe_by_low(table, t1, t3, direction):
     if bfe:
         #ext = np.max(table.iloc[t1:bfe][LOW])
         for i in range(table.iloc[t1:bfe]):
-            if table.iloc[i][LOW] < table[bfe][LOW]:
+            if float(table.iloc[i][LOW]) < float(table[bfe][LOW]):
                 continue
             else:
                 lpi = table.iloc[i]
@@ -197,11 +197,11 @@ def bfe_by_high(table, t1, t3, direction):
     bfe = None # base fragmenting ext.
     lpi = None # level-priced intersection
     ext = None # bfe approving ext.
-    for i in range(table.iloc[t1:t3]):
-        if table.iloc[i][HIGH] > table.iloc[i+1][HIGH]:
+    for i in table.iloc[t1:t3].iterrows():
+        if float(table.iloc[i][HIGH]) > float(table.iloc[i+1][HIGH]):
             continue
         else:
-            if table.iloc[i+1][HIGH] > table.iloc[i+2][HIGH]:
+            if float(table.iloc[i+1][HIGH]) > float(table.iloc[i+2][HIGH]):
                 bfe = table.iloc[i+1] #bfe candidate                                               
                 break
             else:
@@ -212,7 +212,7 @@ def bfe_by_high(table, t1, t3, direction):
     if bfe:
         #ext = np.max(table.iloc[t1:bfe][LOW])                                                     
         for i in range(table.iloc[t1:bfe]):
-            if table.iloc[i][HIGH] > table[bfe][HIGH]:
+            if float(table.iloc[i][HIGH]) > float(table[bfe][HIGH]):
                 continue
             else:
                 lpi = table.iloc[i]

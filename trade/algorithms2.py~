@@ -166,64 +166,64 @@ def bfe_by_low(table, t1, t3, direction):
     lpi = None # level-priced intersection
     ext = None # bfe approving ext.
     for i in range(table.iloc[t1:t3]):
-            if table.iloc[i][LOW] < table.iloc[i+1][LOW]:
+        if table.iloc[i][LOW] < table.iloc[i+1][LOW]:
+            continue
+        else:
+            if table.iloc[i+1][LOW] < table.iloc[i+2][LOW]:
+                bfe = table.iloc[i+1] #bfe candidate
+                break
+            else:
+                i += 1
+                continue
+        print('no bfe whatsoever')
+        
+    if bfe:
+        #ext = np.max(table.iloc[t1:bfe][LOW])
+        for i in range(table.iloc[t1:bfe]):
+            if table.iloc[i][LOW] < table[bfe][LOW]:
                 continue
             else:
-                if table.iloc[i+1][LOW] < table.iloc[i+2][LOW]:
-                    bfe = table.iloc[i+1] #bfe candidate
-                    break
-                else:
-                    i += 1
-                    continue
-        print('no bfe\'s whatsoever')
+                lpi = table.iloc[i]
+                print('bfe level-priced intersec. in {}'.format(i))
+                break
         
-        if bfe:
-            #ext = np.max(table.iloc[t1:bfe][LOW])
-            for i in range(table.iloc[t1:bfe]):
-                if table.iloc[i][LOW] < table[bfe][LOW]:
-                    continue
-                else:
-                    lpi = table.iloc[i]
-                    print('bfe level-priced intersec. in {}'.format(i))
-                    break
-        
-        if bfe and lpi:               
-            if find_interval_extremum(table, lpi, bfe, HIGH):
-                return print(find_interval_extremum(table, lpi, bfe, HIGH))
-            else:
-                return print('there\'s no approving ext. => no bfe => t3 is ok')
+    if bfe and lpi:               
+        if find_interval_extremum(table, lpi, bfe, HIGH):
+            return print(find_interval_extremum(table, lpi, bfe, HIGH))
+        else:
+            return print('there\'s no approving ext. => no bfe => t3 is ok')
 
 def bfe_by_high(table, t1, t3, direction):
     bfe = None # base fragmenting ext.
     lpi = None # level-priced intersection
     ext = None # bfe approving ext.
     for i in range(table.iloc[t1:t3]):
-            if table.iloc[i][HIGH] > table.iloc[i+1][HIGH]:
+        if table.iloc[i][HIGH] > table.iloc[i+1][HIGH]:
+            continue
+        else:
+            if table.iloc[i+1][HIGH] > table.iloc[i+2][HIGH]:
+                bfe = table.iloc[i+1] #bfe candidate                                               
+                break
+            else:
+                i += 1
+                continue
+        print('no bfe whatsoever')
+
+    if bfe:
+        #ext = np.max(table.iloc[t1:bfe][LOW])                                                     
+        for i in range(table.iloc[t1:bfe]):
+            if table.iloc[i][HIGH] > table[bfe][HIGH]:
                 continue
             else:
-                if table.iloc[i+1][HIGH] > table.iloc[i+2][HIGH]:
-                    bfe = table.iloc[i+1] #bfe candidate                                               
-                    break
-                else:
-                    i += 1
-                    continue
-        print('no bfe\'s whatsoever')
+                lpi = table.iloc[i]
+                print('bfe level-priced intersec. in {}'.format(i))
+                break
 
-        if bfe:
-            #ext = np.max(table.iloc[t1:bfe][LOW])                                                     
-            for i in range(table.iloc[t1:bfe]):
-                if table.iloc[i][HIGH] > table[bfe][HIGH]:
-                    continue
-                else:
-                    lpi = table.iloc[i]
-                    print('bfe level-priced intersec. in {}'.format(i))
-                    break
-
-        if bfe and lpi:
-            if find_interval_extremum(table, lpi, bfe, LOW):
-                        return print(find_interval_extremum(table, lpi, bfe, LOW))
-            else:
-                return print('there\'s no approving ext. => no bfe => t3 is ok')
+    if bfe and lpi:
+        if find_interval_extremum(table, lpi, bfe, LOW):
+            return print(find_interval_extremum(table, lpi, bfe, LOW))
+        else:
+            return print('there\'s no approving ext. => no bfe => t3 is ok')
 
 
 def base_fragmenting_extremums(table, t1, t3, direction):
@@ -231,3 +231,6 @@ def base_fragmenting_extremums(table, t1, t3, direction):
         return bfe_by_low(table, t1, t3, direction)
     else:
         return bfe_by_high(table, t1, t3, direction)
+
+
+        
