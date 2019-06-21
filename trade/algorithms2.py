@@ -14,34 +14,25 @@ def algorithm_t1(table, start):
     while True:
         # На шаг ближе к декларативному стилю
         # Бывшая переменная start идет в ад, теперь все в параметре
-        print(start)
         if start > table.shape[0]:
             return False
         p_t1, intersection, by_low = find_p1(table, start)
         if not p_t1:
             if start == table.shape[0]:
-                print('t1 end')
                 return False
-            print('t1 + 1')
-            print('t1 last: ' + str(p_t1))
             start += 1
             continue
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
         if not p_t3:
             if start == table.shape[0]:
-                print('t2 end')
                 return False
-            print('t3 t1 + 1')
             start = p_t1+1
             continue
         p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
         if not p_t2:
-            print('t2 t1 + 1')
             start = p_t1+1
             continue
         break
-
-    print(start)
 
     return {
         't1': {
@@ -85,7 +76,6 @@ def find_p1(table, start):
         return False, False, False
 
 def find_p3(table, p_t1, intersection, by_low):
-    print('Hi2')
     p_t3 = None
     stop_point = None
     try:
