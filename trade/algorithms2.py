@@ -85,9 +85,7 @@ def find_p3(table, p_t1, intersection, by_low):
 def find_interval_extremum(table, from_point, to_point, direction):
     extremum = table.iloc[from_point][direction]
     ext_index = False
-    for i, (index, row) in enumerate(table.iterrows()):
-        if i < from_point: continue
-        if i > to_point: break
+    for i, row in table.iloc[from_point:to_point].iterrows():
         if direction == LOW:
             if row[LOW] < extremum:
                 if row[LOW] < table.iloc[i-1][LOW] and row[LOW] < table.iloc[i+1][LOW]:
@@ -103,9 +101,8 @@ def find_interval_extremum(table, from_point, to_point, direction):
 
 def find_high_extremum(table, start_point):
     last_extremum = 0
-    iterator = table.iterrows()
-    for i, (index, row) in enumerate(iterator):
-        if i < start_point: continue
+    iterator = table.iloc[start_point:].iterrows()
+    for i, row in iterator:
         try:
             if float(table.iloc[i+1][HIGH]) < float(row[HIGH]) and float(table.iloc[i-1][HIGH]) < float(row[HIGH]):
                 if row[HIGH] < table.iloc[last_extremum][HIGH]:
@@ -118,9 +115,8 @@ def find_high_extremum(table, start_point):
 
 def find_low_extremum(table, start_point):
     last_extremum = None
-    iterator = table.iterrows()
-    for i, (index, row) in enumerate(iterator):
-        if i < start_point: continue
+    iterator = table.iloc[start_point:].iterrows()
+    for i, row in iterator:
         try:
             if float(table.iloc[i+1][LOW]) > float(row[LOW]) and float(table.iloc[i-1][LOW]) > float(row[LOW]):
                 if last_extremum is not None and row[LOW] > table.iloc[last_extremum][LOW]:
