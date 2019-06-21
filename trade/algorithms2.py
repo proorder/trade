@@ -3,7 +3,6 @@ INTERSECTION_DEPTH = 49
 LOW = '<LOW>'
 HIGH = '<HIGH>'
 
-
 def algorithm_t1(table, start):
     p_t1 = None
     p_t3 = None
@@ -154,3 +153,63 @@ def find_trend_line_breakdown(table, p1, p2, direction):
     else:
         return interval.loc[lambda el: el[HIGH] < (el.index-p1)/percent*h]
 
+def base_fragmenting_extremums(table, t1, t3, direction):
+    bfe = None # base fragmenting ext.
+    lpi = None # level-priced intersection
+    ext = None # bfe approving ext.
+    if direction == LOW:
+        for i in range(table.iloc[t1:t3]):
+            if table.iloc[i][LOW] < table.iloc[i+1][LOW]:
+                continue
+            else:
+                if table.iloc[i+1][LOW] < table.iloc[i+2][LOW]:
+                    bfe = table.iloc[i+1] #bfe candidate
+                    break
+                else:
+                    i += 1
+                    continue
+        print('no bfe\'s whatsoever')
+        
+        if bfe:
+            #ext = np.max(table.iloc[t1:bfe][LOW])
+            for i in range(table.iloc[t1:bfe]):
+                if table.iloc[i][LOW] < table[bfe][LOW]:
+                    continue
+                else:
+                    lpi = table.iloc[i]
+                    print('bfe level-priced intersec. in {}'.format(i))
+                    break
+        
+        if bfe and lpi:               
+            if find_interval_extremum(table, lpi, bfe, !direction):
+                return print(find_interval_extremum(table, lpi, bfe, !direction))
+            else:
+                return print('there\'s no approving ext. => no bfe => t3 is ok')
+    else:
+        for i in range(table.iloc[t1:t3]):
+            if table.iloc[i][HIGH] > table.iloc[i+1][HIGH]:
+                continue
+            else:
+                if table.iloc[i+1][HIGH] > table.iloc[i+2][HIGH]:
+                    bfe = table.iloc[i+1] #bfe candidate                                               
+                    break
+                else:
+                    i += 1
+                    continue
+        print('no bfe\'s whatsoever')
+
+        if bfe:
+            #ext = np.max(table.iloc[t1:bfe][LOW])                                                     
+            for i in range(table.iloc[t1:bfe]):
+                if table.iloc[i][HIGH] > table[bfe][HIGH]:
+                    continue
+                else:
+                    lpi = table.iloc[i]
+                    print('bfe level-priced intersec. in {}'.format(i))
+                    break
+
+        if bfe and lpi:
+            if find_interval_extremum(table, lpi, bfe, !direction):
+                        return print(find_interval_extremum(table, lpi, bfe, !direction))
+            else:
+                return print('there\'s no approving ext. => no bfe => t3 is ok')

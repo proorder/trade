@@ -24,9 +24,8 @@ def algorithm_t1(table, start):
             # TODO: Выяснить причины пропуска
             start = p_t1
             continue
+        p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
         break
-
-    p_t4 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
 
     return {
         't1': {
@@ -46,7 +45,6 @@ def algorithm_t1(table, start):
             'HIGH': p_t4 if by_low else None
         }
     }
-        
 
 def find_p1(table, start):
     by_low = True
@@ -87,9 +85,7 @@ def find_p3(table, p_t1, intersection, by_low):
 def find_interval_extremum(table, from_point, to_point, direction):
     extremum = table.iloc[from_point][direction]
     ext_index = False
-    for i, (index, row) in enumerate(table.iterrows()):
-        if i < from_point: continue
-        if i > to_point: break
+    for i, row in table.iloc[from_point:to_point].iterrows():
         if direction == LOW:
             if row[LOW] < extremum:
                 if row[LOW] < table.iloc[i-1][LOW] and row[LOW] < table.iloc[i+1][LOW]:
@@ -105,9 +101,8 @@ def find_interval_extremum(table, from_point, to_point, direction):
 
 def find_high_extremum(table, start_point):
     last_extremum = 0
-    iterator = table.iterrows()
-    for i, (index, row) in enumerate(iterator):
-        if i < start_point: continue
+    iterator = table.iloc[start_point:].iterrows()
+    for i, row in iterator:
         try:
             if float(table.iloc[i+1][HIGH]) < float(row[HIGH]) and float(table.iloc[i-1][HIGH]) < float(row[HIGH]):
                 if row[HIGH] < table.iloc[last_extremum][HIGH]:
@@ -120,9 +115,8 @@ def find_high_extremum(table, start_point):
 
 def find_low_extremum(table, start_point):
     last_extremum = None
-    iterator = table.iterrows()
-    for i, (index, row) in enumerate(iterator):
-        if i < start_point: continue
+    iterator = table.iloc[start_point:].iterrows()
+    for i, row in iterator:
         try:
             if float(table.iloc[i+1][LOW]) > float(row[LOW]) and float(table.iloc[i-1][LOW]) > float(row[LOW]):
                 if last_extremum is not None and row[LOW] > table.iloc[last_extremum][LOW]:
@@ -150,4 +144,13 @@ def find_level_of_intersection(table, level_point, direction):
             if row[HIGH] > table.iloc[level_point][HIGH]:
                 return i
         i -= 1
+
+def find_trend_line_breakdown(table, p1, p2, direction):
+    interval = table.iloc[p1:p2]
+    h = table.iloc[p2][direction] - table.iloc[p1][direction]
+    percent = (p2-p1)/100
+    if direction == LOW:
+        return interval.loc[lambda el: el[LOW] < (el.index-p1)/percent*h]
+    else:
+        return interval.loc[lambda el: el[HIGH] < (el.index-p1)/percent*h]
 
