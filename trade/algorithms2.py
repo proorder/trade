@@ -24,9 +24,8 @@ def algorithm_t1(table, start):
             # TODO: Выяснить причины пропуска
             start = p_t1
             continue
+        p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
         break
-
-    p_t4 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
 
     return {
         't1': {
@@ -46,7 +45,6 @@ def algorithm_t1(table, start):
             'HIGH': p_t4 if by_low else None
         }
     }
-        
 
 def find_p1(table, start):
     by_low = True
@@ -151,8 +149,12 @@ def find_level_of_intersection(table, level_point, direction):
                 return i
         i -= 1
 
-def find_trend_line_breakdown(table, p1, p2):
+def find_trend_line_breakdown(table, p1, p2, direction):
     interval = table.iloc[p1:p2]
-    h = table.iloc[p2][LOW or HIGH] - table.iloc[p1][LOW or HIGH]
+    h = table.iloc[p2][direction] - table.iloc[p1][direction]
     percent = (p2-p1)/100
-    return interval.loc[lambda el: el[LOW or HIGH] != (el.index-p1)/percent*h]
+    if direction == LOW:
+        return interval.loc[lambda el: el[LOW] < (el.index-p1)/percent*h]
+    else:
+        return interval.loc[lambda el: el[LOW] < (el.index-p1)/percent*h]
+
