@@ -181,8 +181,8 @@ def base_fragmenting_extremums(table, t1, t3, direction):
                     break
         
         if bfe and lpi:               
-            if find_interval_extremum(table, lpi, bfe, !direction):
-                return print(find_interval_extremum(table, lpi, bfe, !direction))
+            if find_interval_extremum(table, lpi, bfe, HIGH):
+                return print(find_interval_extremum(table, lpi, bfe, HIGH))
             else:
                 return print('there\'s no approving ext. => no bfe => t3 is ok')
     else:
@@ -209,7 +209,7 @@ def base_fragmenting_extremums(table, t1, t3, direction):
                     break
 
         if bfe and lpi:
-            if find_interval_extremum(table, lpi, bfe, !direction):
-                        return print(find_interval_extremum(table, lpi, bfe, !direction))
+            if find_interval_extremum(table, lpi, bfe, HIGH):
+                        return print(find_interval_extremum(table, lpi, bfe, HIGH))
             else:
                 return print('there\'s no approving ext. => no bfe => t3 is ok')
