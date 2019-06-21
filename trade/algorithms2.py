@@ -14,16 +14,24 @@ def algorithm_t1(table, start):
     while True:
         # На шаг ближе к декларативному стилю
         # Бывшая переменная start идет в ад, теперь все в параметре
+        if start > table.shape[0]:
+            return False
         p_t1, intersection, by_low = find_p1(table, start)
         if not p_t1:
-            start = p_t1
+            if start == table.shape[0]:
+                return False
+            start = p_t1+1
             continue
         p_t3 = find_p3(table, p_t1+1, intersection, by_low)
         if not p_t3:
-            # TODO: Выяснить причины пропуска
-            start = p_t1
+            if start == table.shape[0]:
+                return False
+            start = p_t1+1
             continue
         p_t2 = find_interval_extremum(table, p_t1+1, p_t3-1, HIGH if by_low else LOW)
+        if not p_t2:
+            start = p_t1+1
+            continue
         break
 
     return {
@@ -49,36 +57,45 @@ def find_p1(table, start):
     by_low = True
     p_t1 = None
     intersection = None
-    if float(table.iloc[start+1][HIGH]) < float(table.iloc[start][HIGH]):
-        p_t1 = find_low_extremum(table, start+1)
-        intersection = find_level_of_intersection(table, p_t1, LOW)
-    else:
-        by_low = False
-        p_t1 = find_high_extremum(table, start+1)
-        intersection = find_level_of_intersection(table, p_t1, HIGH)
-    if not intersection:
-        from_point = start - 50 if start - 50 > -1 else 0
-        extremum = find_interval_extremum(table, from_point, p_t1-1, HIGH if not by_low else LOW)
-        if not extremum:
-            return False, False, False
-    return p_t1, intersection, by_low
+    try:
+        if float(table.iloc[start+1][HIGH]) < float(table.iloc[start][HIGH]):
+            p_t1 = find_low_extremum(table, start+1)
+            intersection = find_level_of_intersection(table, p_t1, LOW)
+        else:
+            by_low = False
+            p_t1 = find_high_extremum(table, start+1)
+            intersection = find_level_of_intersection(table, p_t1, HIGH)
+        if not intersection:
+            from_point = start-50 if start-50 > -1 else 0
+            extremum = find_interval_extremum(table, from_point, p_t1-1, HIGH if not by_low else LOW)
+            if not extremum:
+                return False, False, False
+        return p_t1, intersection, by_low
+    except Exception:
+        start = table.shape[0]
+        return False, False, False
 
 def find_p3(table, p_t1, intersection, by_low):
+    print('Hi2')
     p_t3 = None
     stop_point = None
-    if by_low:
-        p_t3 = find_low_extremum(table, p_t1+1)
-        # Проверка преодоления т3
-        if table.iloc[p_t1][LOW] > table.iloc[p_t3][LOW]:
+    try:
+        if by_low:
+            p_t3 = find_low_extremum(table, p_t1+1)
+            # Проверка преодоления т3
+            if table.iloc[p_t1][LOW] > table.iloc[p_t3][LOW]:
+                return False
+        else:
+            p_t3 = find_high_extremum(table, p_t1+1)
+            # Проверка преодоления т3
+            if table.iloc[p_t1][HIGH] < table.iloc[p_t3][HIGH]:
+                return False
+        if p_t3 - p_t1 > T1_T3_DEPTH:
             return False
-    else:
-        p_t3 = find_high_extremum(table, p_t1+1)
-        # Проверка преодоления т3
-        if table.iloc[p_t1][HIGH] < table.iloc[p_t3][HIGH]:
-            return False
-    if p_t3 - p_t1 > T1_T3_DEPTH:
+        return p_t3
+    except Exception:
+        start = table.shape[0]
         return False
-    return p_t3
 
 
 def find_interval_extremum(table, from_point, to_point, direction):
@@ -144,7 +161,7 @@ def find_level_of_intersection(table, level_point, direction):
                 return i
         i -= 1
 
-def find_trend_line_breakdown(table, p1, p2, direction):    
+def find_trend_line_breakdown(table, p1, p2, direction):
     interval = table.iloc[p1:p2]
     a = []
     if direction == LOW:
