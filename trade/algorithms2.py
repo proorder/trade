@@ -32,6 +32,7 @@ def algorithm_t1(table, start):
         if not p_t2:
             start = p_t1+1
             continue
+        p_t4 = find_p4(table, p_t2, by_low)
         break
 
     return {
@@ -96,6 +97,26 @@ def find_p3(table, p_t1, intersection, by_low):
         start = table.shape[0]
         return False
 
+def find_p4(table, p_t2, by_low):
+    count = p_t2
+    p_t4 = None
+    while True:
+        if by_low:
+            p_t4 = find_high_extremum(table, count+1)
+        else:
+            p_t4 = find_low_extremum(table, count+1)
+        if not p_t4:
+            return False
+        if by_low:
+            if table.iloc[p_t2][HIGH] > table.iloc[p_t4][HIGH]:
+                count = p_t4
+                continue
+        else:
+            if table.iloc[p_t2][LOW] < table.iloc[p_t4][LOW]:
+                count = p_t4
+                continue
+        break
+    return p_t4
 
 def find_interval_extremum(table, from_point, to_point, direction):
     extremum = table.iloc[from_point][direction]

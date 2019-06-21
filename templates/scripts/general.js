@@ -235,16 +235,16 @@ class Graph {
         t3.x + this.getBarWidth() / 2,
         t3.y - t3.low - t3.body - t3.high + 0.5
       );
-      /*
-      this.ctx.moveTo(
-        t2.x + this.getBarWidth() / 2,
-        t2.y + 0.5
-      );
-      this.ctx.lineTo(
-        t4.x + this.getBarWidth() / 2,
-        t4.y + 0.5
-      );
-      */
+      if (t2 !== undefined && t4 !== undefined) {
+        this.ctx.moveTo(
+          t2.x + this.getBarWidth() / 2,
+          t2.y + 0.5
+        );
+        this.ctx.lineTo(
+          t4.x + this.getBarWidth() / 2,
+          t4.y + 0.5
+        );
+      }
       this.ctx.stroke();
     } else {
       let t1 = this.bars[this.source.length - points.t1.LOW - 1 - Math.floor(index)];
@@ -277,16 +277,16 @@ class Graph {
         t3.x + this.getBarWidth()/2,
         t3.y + 0.5
       );
-      /*
-      this.ctx.moveTo(
-        t2.x + this.getBarWidth() / 2,
-        t2.y - t2.low - t2.body - t2.high + 0.5
-      );
-      this.ctx.lineTo(
-        t4.x + this.getBarWidth() / 2,
-        t4.y - t4.low - t4.body - t4.high + 0.5
-      );
-      */
+      if (t2 !== undefined && t4 !== undefined) {
+        this.ctx.moveTo(
+          t2.x + this.getBarWidth() / 2,
+          t2.y - t2.low - t2.body - t2.high + 0.5
+        );
+        this.ctx.lineTo(
+          t4.x + this.getBarWidth() / 2,
+          t4.y - t4.low - t4.body - t4.high + 0.5
+        );
+      }
       this.ctx.stroke();
     }
   }
