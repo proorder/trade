@@ -48,8 +48,14 @@ class Graph {
             .then(body => body.json())
             .then(res => {
               if (res.t1 !== undefined && res.t3 !== undefined) {
-                this.points = res;
+                if (res.t1.LOW !== null || res.t1.HIGH !== null) {
+                  this.points = res;
+                } else {
+                  alert('Точка 1 не найдена.');
+                }
                 // this.redraw();
+              } else {
+                alert('Точка 1 не найдена.');
               }
             });
         }
