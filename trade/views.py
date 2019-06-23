@@ -2,7 +2,7 @@ from django.views.generic import View
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 import pandas as pd, json
-from .algorithms2 import algorithm_t1
+from .algorithms3 import algorithm_t1
 
 
 def select(request):

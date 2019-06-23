@@ -136,7 +136,7 @@ def find_interval_extremum(table, from_point, to_point, direction):
 
 
 def find_high_extremum(table, start_point):
-    last_extremum = 0
+    last_extremum = start_point
     iterator = table.iloc[start_point:].iterrows()
     for i, row in iterator:
         try:
